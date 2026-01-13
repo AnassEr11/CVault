@@ -1,8 +1,5 @@
 CC ?= gcc
-CFLAGS = -Wall \
-		 -Wextra \
-		 -O2 \
-		 -fPIC \
+CFLAGS = -O2 \
 		 -Iinclude \
 		 -Iinclude/vendor
 LDFLAGS = -lssl -lcrypto -lcurl -lpthread -ldl
@@ -11,14 +8,17 @@ OBJ_DIR = obj
 BIN_NAME = execute_CVault
 TEST_SRC_DIR = test/src
 TEST_EXEC_DIR = test/exec
-CORE_SRCS = $(wildcard src/core/*.c) \
-			$(wildcard src/utils/*.c) \
-			$(wildcard src/vendor/*/*.c) \
-			$(wildcard src/vendor/argon2/blake2/*.c)
+CORE_SRCS = $(wildcard src/utils/*.c) \
+            $(wildcard src/vendor/*/*.c) \
+            $(wildcard src/vendor/argon2/blake2/*.c) \
+            $(wildcard src/crypto/*.c) \
+            $(wildcard src/repository/*.c) \
+            $(wildcard src/service/*.c)
+
 CLI_SRCS  = src/main.c $(wildcard src/cli/*.c)
 TEST_SRCS = $(wildcard $(TEST_SRC_DIR)/*.c)
-CORE_OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(CORE_SRCS))
-CLI_OBJS  = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(CLI_SRCS))
+CORE_OBJS = $(patsubst %.c, $(OBJ_DIR)/%.o, $(subst $(SRC_DIR)/,,$(CORE_SRCS)))
+CLI_OBJS  = $(patsubst %.c, $(OBJ_DIR)/%.o, $(subst $(SRC_DIR)/,,$(CLI_SRCS)))
 TEST_BINS = $(patsubst $(TEST_SRC_DIR)/%.c, $(TEST_EXEC_DIR)/%, $(TEST_SRCS))
 
 .PHONY: all clean dirs cli tests run_tests
@@ -26,7 +26,9 @@ TEST_BINS = $(patsubst $(TEST_SRC_DIR)/%.c, $(TEST_EXEC_DIR)/%, $(TEST_SRCS))
 all: dirs cli
 
 dirs:
-	@mkdir -p $(OBJ_DIR)/core
+	@mkdir -p $(OBJ_DIR)/crypto
+	@mkdir -p $(OBJ_DIR)/repository
+	@mkdir -p $(OBJ_DIR)/service
 	@mkdir -p $(OBJ_DIR)/utils
 	@mkdir -p $(OBJ_DIR)/cli
 	@mkdir -p $(OBJ_DIR)/vendor/sqlite3
@@ -59,4 +61,3 @@ run_tests: tests
 clean:
 	@echo "Cleaning up..."
 	rm -rf $(OBJ_DIR) $(TEST_EXEC_DIR) $(BIN_NAME)
-
