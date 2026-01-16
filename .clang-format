@@ -1,0 +1,48 @@
+---
+# The base style to inherit from (LLVM is the standard for C/C++)
+BasedOnStyle: LLVM
+
+# Use 4 spaces for indentation (Common for modern C)
+IndentWidth: 4
+
+# Ensures the brace stays on the same line as the control statement (if/while/for)
+BreakBeforeBraces: Attach
+
+# Align parameters on the next line if they don't fit on one line
+AlignAfterOpenBracket: Align
+
+# Set the maximum line length to 100 characters to keep code readable
+ColumnLimit: 100
+
+# Put the pointer alignment to the right (int *ptr instead of int* ptr)
+# This is the standard convention in C to avoid confusion in multi-declarations
+PointerAlignment: Right
+
+# Ensures there is a space after control flow keywords (if, for, while)
+SpaceBeforeParens: ControlStatements
+
+# Adds a space after the '//' in a comment for better readability
+SpacesInContainerLiterals: true
+
+# If a function call's arguments are too long, put them on new lines
+AllowAllParametersOfDeclarationOnNextLine: false
+
+# Keeps 'else' on the same line as the closing '}' of the 'if'
+AllowShortIfStatementsOnASingleLine: false
+
+# Disallows putting an entire function on a single line
+AllowShortFunctionsOnASingleLine: None
+
+# Sort #include directives alphabetically (keeps headers organized)
+SortIncludes: true
+
+# Adds a space after a cast: (int) x -> (int)x
+SpaceAfterCStyleCast: false
+
+# Ensures that the indentation of 'public/private' (if used in C++ headers) 
+# or labels (like 'goto:' labels) is handled correctly
+AccessModifierOffset: -4
+
+# Indent 'case' labels inside a switch statement
+IndentCaseLabels: true
+---
