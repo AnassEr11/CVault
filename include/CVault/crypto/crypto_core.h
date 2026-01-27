@@ -16,19 +16,19 @@
 #define TAG_LEN       16
 
 /**
- * @brief: hashes a password and a titan_key and a salt and produces a 64 bits
+ * @brief: hashes a password and a titan_key and a salt and produces a 64 bytes
  * data
  *
  * @param: password a string as const char*
- * @param: titan_key random data of 32 bits as const uint8_t*
- * @param: salt random data of 32 bits as const uint8_t*
+ * @param: titan_key random data of 32 bytes as const uint8_t*
+ * @param: salt random data of 32 bytes as const uint8_t*
  * @param: out_key the uint8_t* pointer of which the result will be stored
  *
  * @return: true if succeed, false otherwise
  *
- * @note: consider allocating memory for the out_key pointer
+ * @note: consider allocating 64 bytes memory for the out_key pointer
  *
- * @warning: the titan_key and salt pointers must point to 32 bit memory block
+ * @warning: the titan_key and salt pointers must point to 32 bytes memory block
  */
 bool derive_key_material(const char *password,
                          const uint8_t *titan_key,
@@ -36,21 +36,21 @@ bool derive_key_material(const char *password,
                          uint8_t *out_key);
 
 /**
- * @brief: hashes a password and a salt and produces a 32 bit data
+ * @brief: hashes a password and a salt and produces a 32 bytes data
  *
  * @param: target the password as a const uint8_t* pointer
- * @param: salt 32bits random data as a const uint8_t* pointer
+ * @param: salt 32 bytes random data as a const uint8_t* pointer
  * @param: out_key the uint8_t* pointer of which the result will be stored
  *
  * @return: true if succeed, false otherwise
  *
- * @note: consider allocating memory for the out_key pointer
+ * @note: consider allocating 32 bytes memory for the out_key pointer
  *
- * @warning: the salt pointer must points to 32 bit memory block
+ * @warning: the salt pointer must points to 32 bytes memory block
  */
 bool hash_key(const uint8_t *key,
-                           const uint8_t *salt,
-                           uint8_t *out_key);
+			  const uint8_t *salt,
+			  uint8_t *out_key);
 
 /**
  * @brief: encrypt data
