@@ -4,33 +4,15 @@
 #include <stdint.h>
 
 /**
- * @brief: Internal Repository Model.
- * used for database operations and internal logic, All string fields
- * are standard null-terminated C strings
+ * @brief Internal vault entry representation.
  *
- * @note: Memory for pointers should typically be managed (allocated/freed)
- * by the service layer
- */
-typedef struct {
-    char *uuid;
-
-    char *service_name;
-    char *username;
-    char *password;
-    char *notes;
-
-    uint64_t created_at;
-    uint64_t updated_at;
-} IntVaultEntry;
-
-/**
- * @brief: External Interface Model
- * used for passing data between the UI and the Crypto Core, Fields are
- * stored as uint8_t buffers to store encrypted binary data (blobs) which
- * may contain null bytes.
+ * this structure stores raw binary buffers, along with their respective
+ * lengths. it is meant for the repository layer
  *
- * @warning: Always use the associated _len fields when reading data,
- * as these buffers are not guaranteed to be null-terminated.
+ * @note:
+ * - uuid is a null-terminated C string.
+ * - other text fields are binary blobs and may contain null bytes.
+ * - *_len fields indicate the size of each blob.
  */
 typedef struct {
     char *uuid;
@@ -47,6 +29,24 @@ typedef struct {
 
     uint64_t created_at;
     uint64_t updated_at;
-} ExtVaultEntry;
+} IntVaultEntry;
 
+/**
+ * @brief External vault entry representation.
+ *
+ * This structure stores actual text fields as null-terminated C strings and
+ * is used at the UI/interface layer.
+ *
+ */
+typedef struct {
+    char *uuid;
+
+    char *service_name;
+    char *username;
+    char *password;
+    char *notes;
+
+    uint64_t created_at;
+    uint64_t updated_at;
+} ExtVaultEntry;
 #endif
