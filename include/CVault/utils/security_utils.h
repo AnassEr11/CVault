@@ -96,4 +96,6 @@ util_result_code generate_password(uint64_t length, char* out_buffer,
  */
 util_result_code copy_string_to_clipboard(char* string);
 
+util_result_code random_raw_bytes(uint64_t size, uint8_t *out_buffer);
+
 #endif
