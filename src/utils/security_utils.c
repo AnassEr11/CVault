@@ -192,6 +192,21 @@ util_result_code copy_string_to_clipboard(char* string) {
 #endif
 }
 
+util_result_code random_raw_bytes(uint64_t size, uint8_t *out_buffer) {
+    if(!out_buffer) {
+	return NULL_POINTER;
+    }
+
+#if defined(__linux__)
+    if (getrandom(out_buffer,size,0) != size){
+	 return SYSCALL_ERR;
+    } 
+    return SUCCESS;
+#else
+    // TODO: add portability to other platforms
+    return NOT_SUPPORTED;
+#endif
+}
 
 static bool clear_clipboard()
 {
