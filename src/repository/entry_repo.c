@@ -1,41 +1,11 @@
 #include "CVault/utils/data_structure_utils.h"
 #include "sqlite3/sqlite3.h"
 #include <CVault/models/vault_entry.h>
-#include <CVault/repository/entry_repo.h>
+#include <CVault/repository/repository.h>
 #include <CVault/utils/security_utils.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-repo_return_code repo_init(sqlite3 *db) {
-    char *sql_create_entries_table = "CREATE TABLE IF NOT EXISTS entries ("
-                                     "uuid CHAR(36) PRIMARY KEY NOT NULL,"
-                                     "service_blob BLOB NOT NULL,"
-                                     "username_blob BLOB NOT NULL,"
-                                     "password_blob BLOB NOT NULL,"
-                                     "notes_blob BLOB,"
-                                     "created_at INTEGER NOT NULL,"
-                                     "updated_at INTEGER NOT NULL"
-                                     ");";
-    if (sqlite3_exec(db, sql_create_entries_table, NULL, NULL, NULL) != SQLITE_OK) {
-        return DATA_BASE_ERR;
-    }
-
-    char *sql_create_configs_table = "CREATE TABLE IF NOT EXISTS configs ("
-                                     "config_key TEXT PRIMARY KEY NOT NULL,"
-                                     "config_value BLOB NOT NULL"
-                                     ");";
-    if (sqlite3_exec(db, sql_create_configs_table, NULL, NULL, NULL) != SQLITE_OK) {
-        return DATA_BASE_ERR;
-    }
-
-    if (sqlite3_exec(db, "PRAGMA journal_mode=WAL;", NULL, NULL, NULL) != SQLITE_OK) {
-        return DATA_BASE_ERR;
-    }
-
-    return OK;
-}
 
 repo_return_code add_entry(IntVaultEntry *entry, sqlite3 *db) {
     char *sql_query =
@@ -394,9 +364,3 @@ repo_return_code delete_all_entries(sqlite3 *db) {
 
     return OK;
 }
-
-repo_return_code add_config(Config *entry, sqlite3 *db);
-repo_return_code read_config(const char *key, Config *out_config, sqlite3 *db);
-repo_return_code update_config(const char *key, Config *new_entry, sqlite3 *db);
-repo_return_code delete_configs(const char *key, sqlite3 *db);
-repo_return_code delete_all_configs(sqlite3 *db);
