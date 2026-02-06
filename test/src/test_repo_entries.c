@@ -20,7 +20,7 @@
 #define COLOR_YELLOW "\033[1;33m"
 #define COLOR_CYAN "\033[0;36m"
 
-#define DB_PATH "/tmp/cvault_test.db"
+#define DB_PATH "/tmp/vault_test.db"
 
 sqlite3 *db = NULL;
 IntVaultEntry *entry1;
@@ -148,7 +148,7 @@ bool init_test() {
 }
 
 bool test_repo_init() {
-    repo_return_code rc = repo_init(db);
+    repo_return_code rc = repo_vault_init(db);
 
     switch (rc) {
         case DATA_BASE_ERR:

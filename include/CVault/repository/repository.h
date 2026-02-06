@@ -20,16 +20,13 @@ typedef enum {
 } repo_return_code;
 
 /**
- * @brief Initialize the repository database schema
- *
- * @details Creates the entries and configs tables if they don't exist,
- * and enables WAL (Write-Ahead Logging) mode for better concurrency
+ * @brief Initialize the vault database schema
  *
  * @param db Pointer to the SQLite database connection
  *
- * @return repo_return_code Status code indicating success or error type
+ * @return repo_return_code OK on success, DATA_BASE_ERR on database erorr
  */
-repo_return_code repo_init(sqlite3 *db);
+repo_return_code repo_vault_init(sqlite3 *db);
 
 /**
  * @brief Add a new vault entry to the repository
@@ -106,6 +103,15 @@ repo_return_code delete_entry(const char *uuid, sqlite3 *db);
  * @return repo_return_code OK on success, DATA_BASE_ERR on database error
  */
 repo_return_code delete_all_entries(sqlite3 *db);
+
+/**
+ * @brief Initialize the config schema
+ *
+ * @param db Pointer to the SQLite database connection
+ *
+ * @return repo_return_code OK on success, DATA_BASE_ERR on database error
+ */
+repo_return_code repo_config_init(sqlite3 *db);
 
 /**
  * @brief Add a new configuration to the repository

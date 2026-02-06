@@ -3,6 +3,23 @@
 #include <stdlib.h>
 #include <string.h>
 
+repo_return_code repo_config_init(sqlite3 *db) {
+    char *sql_create_configs_table = "CREATE TABLE IF NOT EXISTS configs ("
+                                     "config_key TEXT PRIMARY KEY NOT NULL,"
+                                     "config_value BLOB NOT NULL"
+                                     ");";
+
+    if (sqlite3_exec(db, sql_create_configs_table, NULL, NULL, NULL) != SQLITE_OK) {
+        return DATA_BASE_ERR;
+    }
+
+    if (sqlite3_exec(db, "PRAGMA journal_mode=WAL;", NULL, NULL, NULL) != SQLITE_OK) {
+        return DATA_BASE_ERR;
+    }
+
+    return OK;
+}
+
 repo_return_code add_config(Config *config, sqlite3 *db) {
     char *sql_query = "INSERT INTO configs (config_key, config_value)"
                       "VALUES (?,?)";
