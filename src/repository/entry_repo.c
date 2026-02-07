@@ -7,6 +7,27 @@
 #include <stdlib.h>
 #include <string.h>
 
+repo_return_code repo_vault_init(sqlite3 *db) {
+    char *sql_create_entries_table = "CREATE TABLE IF NOT EXISTS entries ("
+                                     "uuid CHAR(36) PRIMARY KEY NOT NULL,"
+                                     "service_blob BLOB NOT NULL,"
+                                     "username_blob BLOB NOT NULL,"
+                                     "password_blob BLOB NOT NULL,"
+                                     "notes_blob BLOB,"
+                                     "created_at INTEGER NOT NULL,"
+                                     "updated_at INTEGER NOT NULL"
+                                     ");";
+    if (sqlite3_exec(db, sql_create_entries_table, NULL, NULL, NULL) != SQLITE_OK) {
+        return DATA_BASE_ERR;
+    }
+
+    if (sqlite3_exec(db, "PRAGMA journal_mode=WAL;", NULL, NULL, NULL) != SQLITE_OK) {
+        return DATA_BASE_ERR;
+    }
+
+    return OK;
+}
+
 repo_return_code add_entry(IntVaultEntry *entry, sqlite3 *db) {
     char *sql_query =
         "INSERT INTO entries "
