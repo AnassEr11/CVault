@@ -1,17 +1,23 @@
-// TODO: modify this logic to store paths in the database
-
+#include <CVault/models/config.h>
+#include <CVault/models/config_keys.h>
+#include <CVault/repository/repository.h>
 #include <CVault/service/environment_service.h>
-#include <linux/limits.h>
+
+#include <CVault/utils/security_utils.h>
+
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <vendor/sqlite3/sqlite3.h>
 
 #if defined(__linux__)
 
 #include <errno.h>
 #include <fcntl.h>
+#include <linux/limits.h>
 #include <sys/stat.h>
 
 char env_config_dir_path[PATH_MAX] = "";
@@ -40,11 +46,7 @@ bool initialize_paths() {
     }
 
     char *config_home;
-    if (!(config_home = getenv("XDG_CONFIG_HOME"))) {
-        snprintf(env_config_dir_path, PATH_MAX, "%s/.config/cvault", home_dir);
-    } else {
-        snprintf(env_config_dir_path, PATH_MAX, "%s/cvault", config_home);
-    }
+    snprintf(env_config_dir_path, PATH_MAX, "%s/%s", home_dir, CONFIG_HOME_PATH);
 
     char *data_home;
     if (!(data_home = getenv("XDG_DATA_HOME"))) {
@@ -59,6 +61,41 @@ bool initialize_paths() {
     snprintf(db_vault_path, PATH_MAX, "%s/%s", env_data_dir_path, DB_VAULT_FILE);
     snprintf(titan_key_path, PATH_MAX, "%s/%s", env_sercret_dir_path, TITAN_KEY_FILE);
 
+    Config *config = malloc(sizeof(Config));
+
+    config->config_key = CFG_VAULT_PATH;
+    config->config_value = (uint8_t *)strdup(db_vault_path);
+    config->config_value_len = strlen(db_vault_path);
+
+    sqlite3 *db;
+    if (sqlite3_open(db_config_path, &db) != SQLITE_OK) {
+        status = ENV_REPO_ERR;
+        return false;
+    }
+
+    if (add_config(config, db) != OK) {
+        status = ENV_REPO_ERR;
+        return false;
+    }
+
+    free(config->config_value);
+    free(config);
+
+    config = malloc(sizeof(Config));
+
+    config->config_key = CFG_TITAN_KEY_PATH;
+    config->config_value = (uint8_t *)strdup(titan_key_path);
+    config->config_value_len = strlen(titan_key_path);
+
+    if (add_config(config, db) != OK) {
+        status = ENV_REPO_ERR;
+        return false;
+    }
+
+    free(config->config_value);
+    free(config);
+
+    sqlite3_close(db);
 #else
     // TODO: add portability to other platforms
     status = ENV_NOT_SUPPORTED;
@@ -68,6 +105,57 @@ bool initialize_paths() {
     env_cdp_len = strlen(env_config_dir_path);
     env_ddp_len = strlen(env_data_dir_path);
     env_sdp_len = strlen(env_sercret_dir_path);
+
+    return true;
+}
+
+bool get_paths() {
+#if defined(__linux__)
+    secure_memset(db_config_path,PATH_MAX);
+    secure_memset(db_vault_path,PATH_MAX);
+    secure_memset(titan_key_path,PATH_MAX);
+
+    char *home_path = getenv("HOME");
+    if (!home_path) {
+        status = ENV_NO_HOME;
+        return false;
+    }
+
+    snprintf(db_config_path, PATH_MAX, "%s/%s/%s", home_path, CONFIG_HOME_PATH,DB_CONFIG_FILE);
+
+    sqlite3 *db;
+    if (sqlite3_open(db_config_path, &db) != SQLITE_OK) {
+        status = ENV_REPO_ERR;
+        return false;
+    }
+
+    Config *out_config = malloc(sizeof(Config));
+
+    if (read_config(CFG_VAULT_PATH, out_config, db) != OK) {
+        status = ENV_REPO_ERR;
+        return false;
+    }
+    snprintf(db_vault_path,PATH_MAX,"%s", (char *)out_config->config_value);
+    db_vault_path[out_config->config_value_len] = '\0';
+
+    free(out_config->config_key);
+    free(out_config->config_value);
+    free(out_config);
+
+    out_config = malloc(sizeof(Config));
+    if (read_config(CFG_TITAN_KEY_PATH, out_config, db) != OK) {
+        status = ENV_REPO_ERR;
+        return false;
+    }
+    strncpy(titan_key_path, (char *)out_config->config_value, PATH_MAX);
+    titan_key_path[out_config->config_value_len] = '\0';
+
+    free(out_config->config_key);
+    free(out_config->config_value);
+    free(out_config);
+
+    sqlite3_close(db);
+#endif /* if defined (__linux__) */
 
     return true;
 }

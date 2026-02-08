@@ -5,8 +5,11 @@
 #include <stddef.h>
 
 #define DB_CONFIG_FILE "config.db"
+#define CONFIG_HOME_PATH ".config/cvault"
 #define DB_VAULT_FILE "vault.db"
 #define TITAN_KEY_FILE "titan.key"
+
+#define ENV_CONFIG_PATH "CVAULT_CONFIG_PATH"
 
 #if defined(__linux__)
 
@@ -68,6 +71,8 @@ extern env_status_enum status;
  * @return `true` if the paths were initialized successfully, `false` otherwise.
  */
 bool initialize_paths();
+
+bool get_paths();
 
 /**
  * @brief Checks if the application environment has been initialized.
